@@ -1,0 +1,11 @@
+# API Keys and Secrets
+.env
+
+# Python environment
+venv/
+__pycache__/
+*.py[cod]
+
+# Streamlit/OS folders
+.streamlit/
+.DS_Store
