@@ -1,0 +1,5 @@
+{
+    "chat.restoreLastPanelSession": true,
+    "chat.agentSessionProjection.enabled": true,
+    "chat.viewProgressBadge.enabled": true
+}

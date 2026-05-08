@@ -1,0 +1,14 @@
+# 核心框架
+fastapi
+uvicorn
+python-dotenv
+
+# 数据抓取与解析
+feedparser    # 专门解析 RSS/XML，超级好用
+requests      # 用于调用 API（如 OpenAI, Pinata）
+
+# AI 与逻辑
+openai        # 用于翻译和评分
+pydantic      # 用于定义数据模型
+
+streamlit       # 用于构建用户界面
