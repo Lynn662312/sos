@@ -42,10 +42,10 @@ sos_project/
 ### Stage 2: Traceability (Day 1 Afternoon) [8-12 hours]
 - [done] **Hasher**: Create SHA-256 hash of raw Japanese alert content.
 - [done] **IPFS**: Implement `upload_to_ipfs()` in `utils/ipfs.py` using Pinata.
-- [ ] **Integration**: Update Scraper to include `hash` and `ipfs_cid` for each alert.
+- [done] **Integration**: Update Scraper to include `hash` and `ipfs_cid` for each alert.
 
 ### Stage 3: Trust Scoring (Day 2 Morning) [6-10 hours]
-- [ ] **Scoring Logic**: In `translator.py`, use Gemini to rate credibility (0-10) based on official vs social markers.
+- [done] **Scoring Logic**: In `translator.py`, use Gemini to rate credibility (0-10) based on official vs social markers.
 - [ ] **API**: Connect everything in `main.py` endpoints: `GET /alerts` and `POST /translate`.
 
 ### Stage 4A: ElevenLabs Integration (PRIMARY - Day 2 Afternoon) [2-4 hours]
