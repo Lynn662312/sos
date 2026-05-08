@@ -23,7 +23,6 @@ sos_project/
 │       ├── hasher.py   # SHA-256 fingerprinting
 │       ├── ipfs.py     # Pinata/IPFS JSON pinning
 │       └── solana.py   # optional Solana devnet provenance helper
-
 └── frontend/
     └── app.py          # Streamlit UI
 
@@ -42,7 +41,7 @@ sos_project/
 
 ### Stage 2: Traceability (Day 1 Afternoon) [8-12 hours]
 - [done] **Hasher**: Create SHA-256 hash of raw Japanese alert content.
-- [ ] **IPFS**: Implement `upload_to_ipfs()` in `utils/ipfs.py` using Pinata.
+- [done] **IPFS**: Implement `upload_to_ipfs()` in `utils/ipfs.py` using Pinata.
 - [ ] **Integration**: Update Scraper to include `hash` and `ipfs_cid` for each alert.
 
 ### Stage 3: Trust Scoring (Day 2 Morning) [6-10 hours]
