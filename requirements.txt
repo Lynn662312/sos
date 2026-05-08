@@ -1,15 +1,20 @@
-﻿# 核心框架
+﻿# --- Core Framework ---
 fastapi
 uvicorn
 python-dotenv
 
-# 数据抓取与解析
-feedparser    # 专门解析 RSS/XML，超级好用
-requests      # 用于调用 API（如 OpenAI, Pinata）
+# --- Data & Web3 ---
+feedparser
+requests
+base58        # Required for Solana key handling
+solana        # Solana RPC client
+solders       # High-performance Solana Python bindings
 
-# AI 与逻辑
-openai        # 用于翻译和评分
-google-genai  # 用于生成内容
-pydantic      # 用于定义数据模型
+# --- AI & Models ---
+google-genai
+pydantic
+pydantic-settings
 
-streamlit       # 用于构建用户界面
+# --- Frontend ---
+streamlit
+elevenlabs    # For Stage 4 Voice integration
