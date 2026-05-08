@@ -10,3 +10,5 @@ __pycache__/
 # Streamlit/OS folders
 .streamlit/
 .DS_Store
+
+roadmap.md

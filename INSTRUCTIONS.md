@@ -26,9 +26,9 @@ sos_project/
 ## 🗓 48-Hour Roadmap (Vibe Coding Guide)
 
 ### Stage 1: Foundation (Day 1 Morning)
-- [ ] **Environment**: Initialize venv, install `fastapi uvicorn feedparser pydantic python-dotenv google-generativeai requests streamlit`.
-- [ ] **Scraper**: Implement `fetch_jma_alerts()` in `scraper.py`. Deduplicate using `entry.id`.
-- [ ] **Models**: Define Pydantic models. Ensure `TranslatedAlert` inherits from `Alert`.
+- [done ] **Environment**: Initialize venv, install `fastapi uvicorn feedparser pydantic python-dotenv google-generativeai requests streamlit`.
+- [done ] **Scraper**: Implement `fetch_jma_alerts()` in `scraper.py`. Deduplicate using `entry.id`.
+- [done ] **Models**: Define Pydantic models. Ensure `TranslatedAlert` inherits from `Alert`.
 - [ ] **AI (Gemini)**: Implement `translate_text()` in `translator.py` using `gemini-2.5-flash`.
 
 ### Stage 2: Traceability (Day 1 Afternoon)
