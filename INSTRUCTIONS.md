@@ -46,32 +46,32 @@ sos_project/
 
 ### Stage 3: Trust Scoring (Day 2 Morning) [6-10 hours]
 - [done] **Scoring Logic**: In `translator.py`, use Gemini to rate credibility (0-10) based on official vs social markers.
-- [ ] **API**: Connect everything in `main.py` endpoints: `GET /alerts` and `POST /translate`.
-- [ ] **Models**: Update `app/models.py` with:
+- [done] **API**: Connect everything in `main.py` endpoints: `GET /alerts` and `POST /translate`.  (but post/translate still not connect with fe)
+- [done] **Models**: Update `app/models.py` with:
   - `category: str` (Values: "Critical", "Warning", "Advisory")
   - `prefecture: str` (default to "Tokyo")
   - `emergency_actions_en: str` and `emergency_actions_zh: str`
-- [ ] **AI Prompt**: Update Gemini prompt to extract `category` and `prefecture`, using Tokyo-first logic and severity classification.
-- [ ] **Backend API**: Support a `prefecture=Tokyo` filter by default and sort alerts so Critical appear first, then Warning, then Advisory.
+- [done] **AI Prompt**: Update Gemini prompt to extract `category` and `prefecture`, using Tokyo-first logic and severity classification.
+- [done] **Backend API**: Support a `prefecture=Tokyo` filter by default and sort alerts so Critical appear first, then Warning, then Advisory.
 
 ### Stage 4A: ElevenLabs Integration (PRIMARY - Day 2 Afternoon) [2-4 hours]
-- [ ] **Audio TTS**: Integrate ElevenLabs in `translator.py`. Add `generate_audio(text, language)` function.
-- [ ] **UI**: Add a prefecture selection sidebar in Streamlit with default "Tokyo" and note that GPS is not supported.
-- [ ] **Color-Coding**: Display alerts as red/ yellow/ blue boxes based on category.
+- [ ] **Audio TTS**: Integrate ElevenLabs in `translator.py`. Add `generate_audio(text, language)` function. 
+- [done] **UI**: Add a prefecture selection sidebar in Streamlit with default "Tokyo" and note that GPS is not supported.
+- [done] **Color-Coding**: Display alerts as red/ yellow/ blue boxes based on category.
 - [ ] **Audio UI**: Add "Play Audio" button for alert title, summary, and emergency action instructions.
 - [ ] **Frontend**: Show audio player or download link for generated speech.
 - [ ] **README**: Document ElevenLabs integration path, the Tokyo-first focus, and which TTS method is used.
-- [ ] **Demo**: Add a test mode or sample Tokyo alert so you can show the Critical red box and audio instructions.
+- [done] **Demo**: Add a test mode or sample Tokyo alert so you can show the Critical red box and audio instructions.
 - **This completes the ElevenLabs track requirement.**
 
 ### Stage 4B: Solana Bonus (OPTIONAL - if time allows) [1-2 hours]
 - [] **Solana Memo**: Use `@solana/web3.js` via simple Python wrapper or direct devnet transaction.
 - [maybe] **Minimal approach**: Store alert hash + IPFS CID in a Solana devnet memo transaction (not a full program).
 - [ ] **Track reference**: Add devnet transaction signature to README for provenance.
-[ ] **Solana Stamper**:
+[done] **Solana Stamper**:
 - Ensure your utils/solana.py is recording the hash + CID on the devnet.
 - Display the Solana Transaction Link in the "Proof" section of the UI.
 
-[ ] **Demo Mode**:
+[done] **Demo Mode**:
 - Since real disasters are (hopefully) not happening right now, create a "Test Trigger" button that loads a mock Earthquake alert so you can show off the Red Box and the Audio Instructions in your video.
 - **Note**: This is a lightweight add-on; full Rust program is NOT required for this minimal approach.

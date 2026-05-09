@@ -1,6 +1,6 @@
 import feedparser
-from app.models import Alert, TranslatedAlert
 import time
+from app.models import Alert, TranslatedAlert
 from app.utils.hasher import generate_content_hash
 from app.translator import _model_to_dict, translate_alert_data
 from app.utils.ipfs import upload_to_ipfs
@@ -12,13 +12,13 @@ PRIORITY = {
     "Advisory": 1
 }
 
-def fetch_jma_alerts():
+def fetch_jma_alerts() -> list[Alert]:
     urls = [
         "https://www.data.jma.go.jp/developer/xml/feed/extra.xml", #随時：気象に関する情報のうち、警報・注意報など随時発表されるもの
         "https://www.data.jma.go.jp/developer/xml/feed/eqvol.xml", #地震火山：地震、火山に関する情報
         "https://www.data.jma.go.jp/developer/xml/feed/other.xml" #その他：その他の情報
     ]
-    alerts: list[TranslatedAlert] = []
+    alerts: list[Alert] = []
     seen_ids: set[str] = set()  # 用于去重
 
     all_entries = []
@@ -29,12 +29,7 @@ def fetch_jma_alerts():
     # Prefer newest items first across all feeds (ISO-8601 updated strings compare well)
     all_entries.sort(key=lambda e: getattr(e, "updated", ""), reverse=True)
 
-    PRIORITY = { "Critical": 3, "Warning": 2, "Advisory": 1 }
-    # Efficiency guard: only process the 3 most recent unique alerts
     for entry in all_entries:
-        if len(alerts) >= 3:
-            break
-
         entry_id = getattr(entry, "id", None)
         if not entry_id or entry_id in seen_ids:
             continue
@@ -55,33 +50,12 @@ def fetch_jma_alerts():
                 updated=getattr(entry, "updated", ""),
             )
 
-            # Step A: hash raw content (use summary/description as canonical text)
-            content_hash = generate_content_hash(alert_obj.summary)
-            alert_obj.hash = content_hash
-
-            # Step B: translate into TranslatedAlert
-            translated = translate_alert_data(alert_obj)
-            time.sleep(2)  # brief pause to respect API rate limits
-
-            # Step C: upload translated alert as JSON to IPFS
-            translated.hash = content_hash
-            ipfs_cid = upload_to_ipfs(_model_to_dict(translated))
-
-            # Step D: record provenance on Solana (best-effort)
-            time.sleep(2)  # brief pause to respect API rate limits
-            record_provenance_on_chain(content_hash, ipfs_cid)
-
-            # Step E: update final object with CID + hash
-            translated.ipfs_cid = ipfs_cid
-            translated.hash = content_hash
-            alerts.append(translated)
+            alerts.append(alert_obj)
             seen_ids.add(entry_id)
-            time.sleep(2)  # brief pause before processing next alert   
         except Exception as e:
-            # Per-entry failure should not crash the scraper (rate limits/timeouts/etc.)
-            print(f"DEBUG: alert pipeline failed for {entry_id}: {e}")
+            print(f"DEBUG: alert fetch failed for {entry_id}: {e}")
             try:
-                # Return at least a minimally-populated TranslatedAlert so the UI/API can still render.
+                # Return at least a minimally-populated Alert so the UI/API can still render.
                 if "content" in entry:
                     fallback_summary = entry.content[0].value
                 elif "summary" in entry:
@@ -89,19 +63,12 @@ def fetch_jma_alerts():
                 else:
                     fallback_summary = "No details available."
 
-                fallback_hash = None
-                try:
-                    fallback_hash = generate_content_hash(fallback_summary)
-                except Exception:
-                    fallback_hash = None
-
-                fallback = TranslatedAlert(
+                fallback = Alert(
                     id=entry_id,
                     title=getattr(entry, "title", ""),
                     summary=fallback_summary,
                     link=getattr(entry, "link", ""),
                     updated=getattr(entry, "updated", ""),
-                    hash=fallback_hash,
                 )
                 alerts.append(fallback)
                 seen_ids.add(entry_id)
@@ -109,8 +76,38 @@ def fetch_jma_alerts():
                 # If even fallback fails, skip this entry.
                 seen_ids.add(entry_id)
                 continue
-    alerts.sort(key=lambda x: (PRIORITY.get(x.category, 0), x.trust_score or 0), reverse=True)           
     return alerts
+
+
+def fetch_jma_alerts_verified(limit: int = 3) -> list[TranslatedAlert]:
+    """
+    Full pipeline: hash -> translate -> IPFS -> Solana provenance.
+    Kept for manual testing; API should prefer Filter-First translation to save quota.
+    """
+    raw = fetch_jma_alerts()
+    verified: list[TranslatedAlert] = []
+    for alert in raw[:limit]:
+        try:
+            content_hash = generate_content_hash(alert.summary)
+            alert.hash = content_hash
+
+            translated = translate_alert_data(alert)
+            time.sleep(2)
+
+            translated.hash = content_hash
+            cid = upload_to_ipfs(_model_to_dict(translated))
+            translated.ipfs_cid = cid
+
+            time.sleep(2)
+            record_provenance_on_chain(content_hash, cid)
+
+            verified.append(translated)
+            time.sleep(2)
+        except Exception as e:
+            print(f"DEBUG: verify pipeline failed for {alert.id}: {e}")
+            verified.append(TranslatedAlert(**_model_to_dict(alert)))
+
+    return verified
 
 if __name__ == "__main__":
     #test the function by fetching and printing the latest alerts

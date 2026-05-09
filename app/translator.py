@@ -55,6 +55,23 @@ def _safe_float(value: Any) -> Optional[float]:
     except (TypeError, ValueError):
         return None
 
+
+def _safe_str_list(value: Any) -> Optional[list[str]]:
+    if value is None:
+        return None
+    if isinstance(value, list):
+        out: list[str] = []
+        for item in value:
+            if item is None:
+                continue
+            out.append(str(item))
+        return out or None
+    if isinstance(value, str):
+        s = value.strip()
+        return [s] if s else None
+    return [str(value)]
+
+
 def translate_alert_data(alert: Alert) -> TranslatedAlert:
     """
     Translate a Japanese JMA alert into English + Simplified Chinese and
@@ -88,6 +105,11 @@ Task:
     - "Critical": For Earthquakes (Intensity 5+), Tsunami Warnings, or Evacuation Orders.
     - "Warning": For standard Weather Warnings (Flood, Heavy Rain, Gale).
     - "Advisory": For minor Advisories (Frost, Dry Air, Fog).
+  9)2. EXTRACT EMERGENCY DETAILS: 
+   - Look for specific shelter locations (避難所).
+   - Look for transport status or "Returning Home" (帰宅困難者) instructions.
+   - Look for food/water distribution points if mentioned.
+  10) If no specific location is mentioned, provide the standard evacuation procedure for this type of alert in Japan (e.g., "Check the 'Safety Tips' app" or "Go to the nearest designated school").
 
 Input (Japanese):
 title: {alert.title}
@@ -99,8 +121,8 @@ Output MUST be strict JSON ONLY (no markdown, no backticks, no extra keys):
   "translated_summary_en": "...",
   "translated_title_zh": "...",
   "translated_summary_zh": "...",
-  "emergency_actions_en": "...",
-  "emergency_actions_zh": "...",
+  "emergency_actions_en": ["..."],
+  "emergency_actions_zh": ["..."],
   "prefecture": "...",
   "category": "Critical|Warning|Advisory",
   "trust_score": 10.0
@@ -133,31 +155,42 @@ Output MUST be strict JSON ONLY (no markdown, no backticks, no extra keys):
             trust_score = max(0.0, min(10.0, trust_score))
 
         # 5. Return the full object
+        alert_data = _model_to_dict(alert)
+        alert_data.pop("prefecture", None)
+        alert_data.pop("category", None)
+
         return TranslatedAlert(
-            **_model_to_dict(alert),
+            **alert_data,
             translated_title_en=payload.get("translated_title_en"),
             translated_summary_en=payload.get("translated_summary_en"),
             translated_title_zh=payload.get("translated_title_zh"),
             translated_summary_zh=payload.get("translated_summary_zh"),
-            emergency_actions_en=payload.get("emergency_actions_en"),
-            emergency_actions_zh=payload.get("emergency_actions_zh"),
+            emergency_actions_en=" | ".join(payload.get("emergency_actions_en")
+            or ["Stay alert for further updates."]),
+            emergency_actions_zh=" | ".join(payload.get("emergency_actions_zh")
+            or ["请保持警惕，等待进一步更新。"]),
             prefecture=payload.get("prefecture"),
             category=payload.get("category"),
             trust_score=trust_score
         )
     except Exception as e:
         print(f"DEBUG ERROR: {e}")
+        #create a dictonary of all the original alert data and add the fallback translations and default values
+        alert_data = _model_to_dict(alert)
+        alert_data.pop("prefecture", None)  
+        alert_data.pop("category", None)
+
         # If it fails, return the original alert with null translations
-        return TranslatedAlert(**_model_to_dict(alert), 
+        return TranslatedAlert(**alert_data, 
                                translated_title_en= alert.title,  # Fallback to original if translation fails
                                translated_summary_en= alert.summary,  # Fallback to original if translation fails
                                 translated_title_zh= alert.title,  # Fallback to original if translation fails
                                 translated_summary_zh= alert.summary,  # Fallback to original if translation fails
-                                prefecture="Unknown",
-                                category="Advisory",
-                               trust_score=None,
-                               emergency_actions_en="AI is busy. Please refer to official sources and stay alert.",
-                               emergency_actions_zh="AI 正在忙碌。请参考官方来源并保持警惕。")
+                                prefecture="Unknown",  # Default if extraction fails
+                                category="Advisory",  # Default if extraction fails
+                                trust_score=None,
+                                emergency_actions_en="AI is busy. Please refer to official sources and stay informed.",  # Default safety message
+                               emergency_actions_zh="AI 正在忙碌。请参考官方来源并保持关注。")
 
 
 if __name__ == "__main__":
