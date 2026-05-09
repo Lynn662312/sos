@@ -6,13 +6,14 @@ from typing import Any
 from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 from fastapi.staticfiles import StaticFiles
 from app.utils.ipfs import upload_to_ipfs
 from app.utils.solana import record_provenance_on_chain
 from app.utils.hasher import generate_content_hash
-from app.models import Alert
+from app.models import Alert, AudioRequest
 from app.scraper import fetch_jma_alerts
-from app.translator import _model_to_dict, translate_alert_data
+from app.translator import _model_to_dict, generate_audio, translate_alert_data
 
 
 app = FastAPI(title="S.O.S API", version="0.1.0")
@@ -97,6 +98,7 @@ def translate(alert: Alert):
 
 
 @app.post("/api/generate-audio/{alert_id}")
-def generate_audio(alert_id: str):
-    return {"status": "ready_for_integration", "alert_id": alert_id}
+def generate_audio_endpoint(alert_id: str, body: AudioRequest):
+    audio_bytes = generate_audio(body.text, body.language)
+    return Response(content=audio_bytes, media_type="audio/mpeg")
 

@@ -30,3 +30,8 @@ class Provenance(BaseModel):
     fetch_timestamp: str
     original_hash: str
     ipfs_cid: str
+
+
+class AudioRequest(BaseModel):
+    text: str
+    language: str = "en"
