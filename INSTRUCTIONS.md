@@ -46,7 +46,7 @@ sos_project/
 
 ### Stage 3: Trust Scoring (Day 2 Morning) [6-10 hours]
 - [done] **Scoring Logic**: In `translator.py`, use Gemini to rate credibility (0-10) based on official vs social markers.
-- [done] **API**: Connect everything in `main.py` endpoints: `GET /alerts` and `POST /translate`.  (but post/translate still not connect with fe)
+- [done] **API**: Connect everything in `main.py` endpoints: `GET /alerts` and `POST /translate`.  (frontend currently uses `GET /alerts`; `POST /translate` exists for manual translation.)
 - [done] **Models**: Update `app/models.py` with:
   - `category: str` (Values: "Critical", "Warning", "Advisory")
   - `prefecture: str` (default to "Tokyo")
@@ -55,11 +55,11 @@ sos_project/
 - [done] **Backend API**: Support a `prefecture=Tokyo` filter by default and sort alerts so Critical appear first, then Warning, then Advisory.
 
 ### Stage 4A: ElevenLabs Integration (PRIMARY - Day 2 Afternoon) [2-4 hours]
-- [ ] **Audio TTS**: Integrate ElevenLabs in `translator.py`. Add `generate_audio(text, language)` function. 
+- [done] **Audio TTS**: Integrate ElevenLabs in `translator.py`. Add `generate_audio(text, language)` function. 
 - [done] **UI**: Add a prefecture selection sidebar in Streamlit with default "Tokyo" and note that GPS is not supported.
 - [done] **Color-Coding**: Display alerts as red/ yellow/ blue boxes based on category.
-- [ ] **Audio UI**: Add "Play Audio" button for alert title, summary, and emergency action instructions.
-- [ ] **Frontend**: Show audio player or download link for generated speech.
+- [done] **Audio UI**: Add "Play Audio" button for alert title, summary, and emergency action instructions.
+- [done] **Frontend**: Show audio player or download link for generated speech.
 - [ ] **README**: Document ElevenLabs integration path, the Tokyo-first focus, and which TTS method is used.
 - [done] **Demo**: Add a test mode or sample Tokyo alert so you can show the Critical red box and audio instructions.
 - **This completes the ElevenLabs track requirement.**
