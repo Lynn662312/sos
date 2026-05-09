@@ -32,7 +32,7 @@ def _parse_to_jst(updated: str) -> str:
 
 
 def _fetch_alerts() -> list[dict[str, Any]]:
-    resp = requests.get(API_URL, timeout=30)
+    resp = requests.get(API_URL, timeout=60)
     resp.raise_for_status()
     payload = resp.json()
     if not isinstance(payload, list):
@@ -87,11 +87,19 @@ else:
             with mcol2:
                 st.write(f"**Time (JST)**: {updated_jst}")
 
-            st.markdown("### Summary (English)")
-            st.write(alert.get("translated_summary_en") or alert.get("summary") or "")
-
-            st.markdown("### Summary (Chinese)")
-            st.write(alert.get("translated_summary_zh") or "")
+            if language == "English":
+                st.markdown("### Summary")
+                st.write(alert.get("translated_summary_en") or alert.get("summary") or "")
+                st.markdown("### Emergency Actions")
+                action_text = alert.get("emergency_actions_en") or "Stay alert for further updates."
+                st.warning(action_text)
+            else:
+                st.markdown("### Summary")
+                st.write(alert.get("translated_summary_zh") or alert.get("summary") or "")
+                st.markdown("### 紧急避难行动")
+                action_text = alert.get("emergency_actions_zh") or "请保持警惕，等待进一步更新。"
+                st.warning(action_text)
+        
 
             st.markdown("### Proof")
             sha = alert.get("hash") or "—"

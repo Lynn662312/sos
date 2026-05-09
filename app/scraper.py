@@ -1,6 +1,6 @@
 import feedparser
 from app.models import Alert, TranslatedAlert
-
+import time
 from app.utils.hasher import generate_content_hash
 from app.translator import _model_to_dict, translate_alert_data
 from app.utils.ipfs import upload_to_ipfs
@@ -54,12 +54,14 @@ def fetch_jma_alerts():
 
             # Step B: translate into TranslatedAlert
             translated = translate_alert_data(alert_obj)
+            time.sleep(2)  # brief pause to respect API rate limits
 
             # Step C: upload translated alert as JSON to IPFS
             translated.hash = content_hash
             ipfs_cid = upload_to_ipfs(_model_to_dict(translated))
 
             # Step D: record provenance on Solana (best-effort)
+            time.sleep(2)  # brief pause to respect API rate limits
             record_provenance_on_chain(content_hash, ipfs_cid)
 
             # Step E: update final object with CID + hash

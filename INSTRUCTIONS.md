@@ -36,8 +36,8 @@ sos_project/
 - [done] **Scraper**: Implement `fetch_jma_alerts()` in `scraper.py`. Deduplicate using `entry.id`.
 - [done] **Models**: Define Pydantic models. Ensure `TranslatedAlert` inherits from `Alert`.
 - [done] **AI (Gemini)**: Implement `translate_text()` in `translator.py` using `gemini-2.5-flash`.
-- [ ] **API**: Set up FastAPI app with CORS in `main.py`. Add `GET /alerts` endpoint.
-- [ ] **UI**: Build basic Streamlit dashboard in `frontend/app.py` to display alerts.
+- [done] **API**: Set up FastAPI app with CORS in `main.py`. Add `GET /alerts` endpoint.
+- [done] **UI**: Build basic Streamlit dashboard in `frontend/app.py` to display alerts.
 
 ### Stage 2: Traceability (Day 1 Afternoon) [8-12 hours]
 - [done] **Hasher**: Create SHA-256 hash of raw Japanese alert content.
@@ -56,7 +56,7 @@ sos_project/
 - **This completes the ElevenLabs track requirement.**
 
 ### Stage 4B: Solana Bonus (OPTIONAL - if time allows) [1-2 hours]
-- [ ] **Solana Memo**: Use `@solana/web3.js` via simple Python wrapper or direct devnet transaction.
-- [ ] **Minimal approach**: Store alert hash + IPFS CID in a Solana devnet memo transaction (not a full program).
+- [] **Solana Memo**: Use `@solana/web3.js` via simple Python wrapper or direct devnet transaction.
+- [maybe] **Minimal approach**: Store alert hash + IPFS CID in a Solana devnet memo transaction (not a full program).
 - [ ] **Track reference**: Add devnet transaction signature to README for provenance.
 - **Note**: This is a lightweight add-on; full Rust program is NOT required for this minimal approach.

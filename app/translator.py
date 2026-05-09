@@ -76,6 +76,8 @@ Task:
 - Translate the following Japanese alert title and summary into:
   1) English
   2) Simplified Chinese (zh)
+  3) KEY REQUIREMENT: Look for any specific official instructions or evacuation orders (e.g., "避難指示", "高台へ移動", "火の始末").
+  4) If instructions exist, extract them into a "emergency_actions" field. If none, put "Stay alert for further updates."
 - Prioritize clarity and direct safety actions for foreigners.
   Use clear imperatives like "Evacuate" / "Move to higher ground" / "Stay indoors" when appropriate.
 - Also compute a trust_score (0.0 to 10.0) based on how official the Japanese text is:
@@ -92,6 +94,8 @@ Output MUST be strict JSON ONLY (no markdown, no backticks, no extra keys):
   "translated_summary_en": "...",
   "translated_title_zh": "...",
   "translated_summary_zh": "...",
+  "emergency_actions_en": "...",
+  "emergency_actions_zh": "...",
   "trust_score": 10.0
 }}
     """.strip()
@@ -128,12 +132,21 @@ Output MUST be strict JSON ONLY (no markdown, no backticks, no extra keys):
             translated_summary_en=payload.get("translated_summary_en"),
             translated_title_zh=payload.get("translated_title_zh"),
             translated_summary_zh=payload.get("translated_summary_zh"),
+            emergency_actions_en=payload.get("emergency_actions_en"),
+            emergency_actions_zh=payload.get("emergency_actions_zh"),
             trust_score=trust_score,
         )
     except Exception as e:
         print(f"DEBUG ERROR: {e}")
         # If it fails, return the original alert with null translations
-        return TranslatedAlert(**_model_to_dict(alert), trust_score=None)
+        return TranslatedAlert(**_model_to_dict(alert), 
+                               translated_title_en= alert.title,  # Fallback to original if translation fails
+                               translated_summary_en= alert.summary,  # Fallback to original if translation fails
+                                translated_title_zh= alert.title,  # Fallback to original if translation fails
+                                translated_summary_zh= alert.summary,  # Fallback to original if translation fails
+                               trust_score=None,
+                               emergency_actions_en="AI is busy. Please refer to official sources and stay alert.",
+                               emergency_actions_zh="AI 正在忙碌。请参考官方来源并保持警惕。")
 
 
 if __name__ == "__main__":
