@@ -17,7 +17,12 @@ class TranslatedAlert(Alert):
     translated_summary_en: Optional[str] = None
     translated_title_zh: Optional[str] = None
     translated_summary_zh: Optional[str] = None
+    emergency_actions_en: Optional[str] = "Stay alert for further updates."
+    emergency_actions_zh: Optional[str] = "请保持警惕，等待进一步更新。"
     trust_score: Optional[float] = None  # 0-10 score for Stage 3
+    prefecture: Optional[str] = None  # e.g. "Tokyo"
+    category: Optional[str] = None  # e.g. "Warning", "Advis
+    ipfs_cid: Optional[str] = None
 
 class Provenance(BaseModel):
     """Track source information for traceability"""
