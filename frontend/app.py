@@ -145,7 +145,10 @@ else:
         trust_value = "—" if trust_score is None else f"{trust_score:.1f} / 10"
 
         expander_label = f"{display_title}  ·  {updated_jst}"
-        with st.expander(expander_label, expanded=False):
+        expander_key = f"exp_{alert.get('id')}"
+        if expander_key not in st.session_state:
+            st.session_state[expander_key] = False
+        with st.expander(expander_label, expanded=st.session_state.get(expander_key, False)):
             st.subheader(title_en)
 
             mcol1, mcol2 = st.columns([1, 2])
@@ -185,13 +188,39 @@ else:
 
             with col1:
                 if st.button("Generate Voice", key=f"btn_{alert.get('id')}"):
-                    # This will call your new audio logic
                     with st.spinner("Synthesizing..."):
-                        # You will implement the POST /api/generate-audio in main.py
-                        audio_url = f"http://localhost:8000/api/audio/{alert.get('id')}.mp3" 
-                        st.session_state[f"audio_{alert.get('id')}"] = audio_url
+                        if language == "Chinese":
+                            summary = alert.get("translated_summary_zh") or alert.get("summary") or ""
+                            emergency_actions = alert.get("emergency_actions_zh") or ""
+                            if isinstance(emergency_actions, list):
+                                emergency_actions = " | ".join(emergency_actions)
+                            tts_text = f"{display_title}. {summary}. {emergency_actions}"
+                            lang_code = "zh"
+                        else:
+                            summary = alert.get("translated_summary_en") or alert.get("summary") or ""
+                            emergency_actions = alert.get("emergency_actions_en") or ""
+                            if isinstance(emergency_actions, list):
+                                emergency_actions = " | ".join(emergency_actions)
+                            tts_text = f"{display_title}. {summary}. {emergency_actions}"
+                            lang_code = "en"
+
+                        try:
+                            resp = requests.post(
+                                f"http://localhost:8000/api/generate-audio/{alert.get('id')}",
+                                json={"text": tts_text, "language": lang_code},
+                                timeout=30,
+                            )
+                            if resp.status_code == 200:
+                                audio_key = f"audio_{alert.get('id')}_{lang_code}"
+                                st.session_state[audio_key] = resp.content
+                            else:
+                                st.error(f"TTS request failed ({resp.status_code}): {resp.text}")
+                        except Exception as e:
+                            st.error(f"TTS request failed: {e}")
 
             # If audio exists, show the player
-            if f"audio_{alert.get('id')}" in st.session_state:
-                st.audio(st.session_state[f"audio_{alert.get('id')}"])
+            lang_code = "zh" if language == "Chinese" else "en"
+            audio_key = f"audio_{alert.get('id')}_{lang_code}"
+            if audio_key in st.session_state:
+                st.audio(st.session_state[audio_key], format="audio/mp3")
 

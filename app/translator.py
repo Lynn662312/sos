@@ -204,7 +204,7 @@ def generate_audio(text: str, language: str = "en") -> bytes:
     audio = client.text_to_speech.convert(
         text=text,
         model_id="eleven_multilingual_v2",
-        voice_id="JBFqnCBsd6RMkjVDRZzb",
+        voice_id = "cgSgspJ2msm6clMCkdW9" if language == "zh" else "JBFqnCBsd6RMkjVDRZzb",
         output_format="mp3_44100_128",
     )
     return b"".join(audio)

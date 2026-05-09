@@ -15,6 +15,7 @@ from app.models import Alert, AudioRequest
 from app.scraper import fetch_jma_alerts
 from app.translator import _model_to_dict, generate_audio, translate_alert_data
 
+_alert_cache: dict = {}
 
 app = FastAPI(title="S.O.S API", version="0.1.0")
 
@@ -69,9 +70,11 @@ def get_alerts(prefecture: str = "Tokyo"):
     # Step C: single loop for hashing, translation, IPFS upload, and provenance recording
     translated = []
     for a in filtered:
+        if a.id in _alert_cache:
+            translated.append(_alert_cache[a.id])
+            continue
         # 1. generate hash
         a.hash = generate_content_hash(a.summary)
-
         #2. translate
         t_alert = translate_alert_data(a)
 
@@ -80,7 +83,9 @@ def get_alerts(prefecture: str = "Tokyo"):
             cid = upload_to_ipfs(_model_to_dict(t_alert))
             t_alert.ipfs_cid = cid
         except Exception as e:
-            print(f"IPFS upload failed for alert {a.id}: {e}")
+            print(f"IPFS upload failed: {e}")
+        
+        _alert_cache[a.id] = t_alert
         translated.append(t_alert)
 
     # Sorting: priority desc, then trust_score desc
@@ -97,7 +102,7 @@ def translate(alert: Alert):
     return jsonable_encoder(translated)
 
 
-@app.post("/api/generate-audio/{alert_id}")
+@app.post("/api/generate-audio/{alert_id:path}")
 def generate_audio_endpoint(alert_id: str, body: AudioRequest):
     audio_bytes = generate_audio(body.text, body.language)
     return Response(content=audio_bytes, media_type="audio/mpeg")
