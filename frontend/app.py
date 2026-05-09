@@ -93,6 +93,12 @@ if not alerts:
     st.info("No alerts to display yet. Click Refresh Alerts.")
 else:
     for alert in alerts:
+        #define content
+        title_en = alert.get("translated_title_en") or alert.get("title") or "Untitled"
+        title_zh = alert.get("translated_title_zh") or alert.get("title") or "Untitled"
+        display_title = title_en if language == "English" else title_zh
+
+        # get the category and set the style
         category = alert.get("category", "Advisory")
 
         #set visual style
@@ -109,9 +115,7 @@ else:
         if selected_prefecture != "All Prefectures" and alert_pref != selected_prefecture:
             continue
         
-        title_en = alert.get("translated_title_en") or alert.get("title") or "Untitled"
-        title_zh = alert.get("translated_title_zh") or alert.get("title") or "Untitled"
-        display_title = title_en if language == "English" else title_zh
+        
         #display high visibility box
         box(f"{icon} **{category.upper()}**: {display_title} ")
         updated_jst = _parse_to_jst(str(alert.get("updated") or ""))
