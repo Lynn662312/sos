@@ -60,11 +60,11 @@ def get_alerts(prefecture: str = "Tokyo"):
     search_keyword = pref_map.get(prefecture, prefecture)
     # search_keyword_l = search_keyword.lower()
     if prefecture == "All Prefectures":
-        filtered = raw[:3] 
+        filtered = raw[:2] 
     else:
-        filtered = [a for a in raw if search_keyword in f"{a.title}{a.summary}"][:3]
+        filtered = [a for a in raw if search_keyword in f"{a.title}{a.summary}"][:2]
         if not filtered:
-            filtered = raw[:3]  # Fallback to top 3 if no matches
+            filtered = raw[:2]  # Fallback to top 2 if no matches
 
     
     # Step C: single loop for hashing, translation, IPFS upload, and provenance recording
