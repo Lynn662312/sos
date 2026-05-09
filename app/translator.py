@@ -193,6 +193,23 @@ Output MUST be strict JSON ONLY (no markdown, no backticks, no extra keys):
                                emergency_actions_zh="AI 正在忙碌。请参考官方来源并保持关注。")
 
 
+def generate_audio(text: str, language: str = "en") -> bytes:
+    api_key = os.getenv("ELEVENLABS_API_KEY")
+    if not api_key:
+        raise RuntimeError("Missing ELEVENLABS_API_KEY in environment/.env")
+
+    from elevenlabs.client import ElevenLabs
+
+    client = ElevenLabs(api_key=api_key)
+    audio = client.text_to_speech.convert(
+        text=text,
+        model_id="eleven_multilingual_v2",
+        voice_id="JBFqnCBsd6RMkjVDRZzb",
+        output_format="mp3_44100_128",
+    )
+    return b"".join(audio)
+
+
 if __name__ == "__main__":
     print("---SOS Project: translator test ---")
     test_alert = Alert(
