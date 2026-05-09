@@ -43,6 +43,32 @@ def _fetch_alerts() -> list[dict[str, Any]]:
 st.set_page_config(page_title="S.O.S (Source of Safety)", layout="wide")
 
 st.title("S.O.S (Source of Safety)")
+with st.sidebar:
+    st.header("📍 Your Location")
+    selected_prefecture = st.selectbox(
+        "Select your prefecture to prioritize relevant alerts:",
+        options=[
+            "All Prefectures",
+            "Hokkaido", "Aomori", "Iwate", "Miyagi", "Akita", "Yamagata", "Fukushima",
+            "Ibaraki", "Tochigi", "Gunma", "Saitama", "Chiba", "Tokyo", "Kanagawa",
+            "Niigata", "Toyama", "Ishikawa", "Fukui",
+            "Yamanashi", "Nagano",
+            "Gifu", "Shizuoka",
+            "Aichi",
+            "Mie",
+            "Shiga", "Kyoto", "Osaka", "Hyogo", "Nara", "Wakayama",
+            "Tottori", "Shimane",
+            "Okayama", "Hiroshima", "Yamaguchi",
+            "Tokushima", "Kagawa", "Ehime", "Kochi",
+            "Fukuoka", "Saga", "Nagasaki", "Kumamoto", "Oita", "Miyazaki", "Kagoshima",
+            "Okinawa"
+        ],
+        index=1
+    )
+    st.info("Note: Manual selection for now. Future versions may auto-detect location or allow saving preferences.")
+    st.divider()
+    st.header("🔊 Audio Settings")
+    auto_generate = st.checkbox("Auto-generate voice for Critical Alerts", value=True)
 st.caption("Instant, Verified Disaster Alerts for Foreigners in Japan.")
 
 col_a, col_b = st.columns([1, 2])
@@ -67,10 +93,27 @@ if not alerts:
     st.info("No alerts to display yet. Click Refresh Alerts.")
 else:
     for alert in alerts:
+        category = alert.get("category", "Advisory")
+
+        #set visual style
+        if category == "Critical":
+            box = st.error
+            icon = "🚨"
+        elif category == "Warning":
+            box = st.warning
+            icon = "⚠️"
+        else:
+            box = st.info
+            icon = "ℹ️"
+        alert_pref = alert.get("prefecture", "Unknown")
+        if selected_prefecture != "All Prefectures" and alert_pref != selected_prefecture:
+            continue
+        
         title_en = alert.get("translated_title_en") or alert.get("title") or "Untitled"
         title_zh = alert.get("translated_title_zh") or alert.get("title") or "Untitled"
-
         display_title = title_en if language == "English" else title_zh
+        #display high visibility box
+        box(f"{icon} **{category.upper()}**: {display_title} ")
         updated_jst = _parse_to_jst(str(alert.get("updated") or ""))
 
         trust_score = alert.get("trust_score", None)
@@ -108,4 +151,18 @@ else:
             st.write(f"**IPFS CID**: `{cid}`")
             if cid != "—":
                 st.link_button("Open IPFS Gateway", f"https://gateway.pinata.cloud/ipfs/{cid}")
+            st.markdown("### 🔊 Voice Instructions")
+            col1, col2 = st.columns([1, 2])
+
+            with col1:
+                if st.button("Generate Voice", key=f"btn_{alert.get('id')}"):
+                    # This will call your new audio logic
+                    with st.spinner("Synthesizing..."):
+                        # You will implement the POST /api/generate-audio in main.py
+                        audio_url = f"http://localhost:8000/api/audio/{alert.get('id')}.mp3" 
+                        st.session_state[f"audio_{alert.get('id')}"] = audio_url
+
+            # If audio exists, show the player
+            if f"audio_{alert.get('id')}" in st.session_state:
+                st.audio(st.session_state[f"audio_{alert.get('id')}"])
 

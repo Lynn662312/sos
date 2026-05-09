@@ -6,6 +6,12 @@ from app.translator import _model_to_dict, translate_alert_data
 from app.utils.ipfs import upload_to_ipfs
 from app.utils.solana import record_provenance_on_chain
 
+PRIORITY = {
+    "Critical": 3,
+    "Warning": 2,
+    "Advisory": 1
+}
+
 def fetch_jma_alerts():
     urls = [
         "https://www.data.jma.go.jp/developer/xml/feed/extra.xml", #随時：気象に関する情報のうち、警報・注意報など随時発表されるもの
@@ -23,6 +29,7 @@ def fetch_jma_alerts():
     # Prefer newest items first across all feeds (ISO-8601 updated strings compare well)
     all_entries.sort(key=lambda e: getattr(e, "updated", ""), reverse=True)
 
+    PRIORITY = { "Critical": 3, "Warning": 2, "Advisory": 1 }
     # Efficiency guard: only process the 3 most recent unique alerts
     for entry in all_entries:
         if len(alerts) >= 3:
@@ -69,6 +76,7 @@ def fetch_jma_alerts():
             translated.hash = content_hash
             alerts.append(translated)
             seen_ids.add(entry_id)
+            time.sleep(2)  # brief pause before processing next alert   
         except Exception as e:
             # Per-entry failure should not crash the scraper (rate limits/timeouts/etc.)
             print(f"DEBUG: alert pipeline failed for {entry_id}: {e}")
@@ -101,7 +109,7 @@ def fetch_jma_alerts():
                 # If even fallback fails, skip this entry.
                 seen_ids.add(entry_id)
                 continue
-
+    alerts.sort(key=lambda x: (PRIORITY.get(x.category, 0), x.trust_score or 0), reverse=True)           
     return alerts
 
 if __name__ == "__main__":
@@ -122,6 +130,8 @@ if __name__ == "__main__":
                 print(f"Title (JP): {i.title}")
                 print(f"Title (EN): {i.translated_title_en}") # New AI Field
                 print(f"Summary (ZH): {i.translated_summary_zh[:50]}...") # New AI Field
+                print(f"Category: {i.category}") # New AI Field
+                print(f"Prefecture: {i.prefecture}") # New AI Field
                 print(f"Trust Score: {i.trust_score}/10.0") # New AI Field
                 print(f"Hash: {i.hash}")
                 print(f"IPFS CID: {i.ipfs_cid}")
