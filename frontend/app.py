@@ -10,11 +10,9 @@ import streamlit as st
 API_URL = "http://localhost:8000/api/alerts"
 JST = timezone(timedelta(hours=9), name="JST")
 
-
 def _parse_to_jst(updated: str) -> str:
     if not updated:
         return "Unknown time"
-
     s = updated.strip()
     try:
         # Handle common ISO-8601 variants
@@ -31,8 +29,8 @@ def _parse_to_jst(updated: str) -> str:
     return dt.astimezone(JST).strftime("%Y-%m-%d %H:%M:%S %Z")
 
 
-def _fetch_alerts() -> list[dict[str, Any]]:
-    resp = requests.get(API_URL, timeout=60)
+def _fetch_alerts(prefecture: str = "All Prefectures") -> list[dict[str, Any]]:
+    resp = requests.get(f"{API_URL}?prefecture={prefecture}", timeout=60)
     resp.raise_for_status()
     payload = resp.json()
     if not isinstance(payload, list):
@@ -82,17 +80,45 @@ if "alerts" not in st.session_state:
 
 if refresh or not st.session_state.alerts:
     try:
-        st.session_state.alerts = _fetch_alerts()
+        st.session_state.alerts = _fetch_alerts(selected_prefecture)
         st.success(f"Loaded {len(st.session_state.alerts)} alerts.")
     except Exception as e:
         st.error(f"Failed to fetch alerts from API: {e}")
 
+# --- ADD MOCK DEMO HERE ---
+if st.sidebar.button("🚀 Trigger Demo Mode"):
+    mock_alert = {
+        "id": "demo-123",
+        "category": "Critical",
+        "prefecture": "Tokyo",
+        "translated_title_en": "Emergency Earthquake Warning",
+        "translated_title_zh": "紧急地震速报",
+        "translated_summary_en": "Major shaking expected in Tokyo area. Seismic intensity 6 Lower.",
+        "translated_summary_zh": "东京地区预计将有剧烈震动。震度 6 弱。",
+        "emergency_actions_en": "Drop, Cover, and Hold on. Stay away from glass.",
+        "emergency_actions_zh": "趴下、掩护、稳住。远离玻璃。",
+        "trust_score": 10.0,
+        "updated": datetime.now(timezone.utc).isoformat(),
+        "hash": "f41bb0443e...",
+        "ipfs_cid": "QmU5ZbzM8..."
+    }
+    # Put mock alert at the very top
+    st.session_state.alerts = [mock_alert] + st.session_state.alerts
+# --------------------------
+
+alerts = st.session_state.alerts or []
 alerts = st.session_state.alerts or []
 
 if not alerts:
     st.info("No alerts to display yet. Click Refresh Alerts.")
 else:
     for alert in alerts:
+        #define content
+        title_en = alert.get("translated_title_en") or alert.get("title") or "Untitled"
+        title_zh = alert.get("translated_title_zh") or alert.get("title") or "Untitled"
+        display_title = title_en if language == "English" else title_zh
+
+        # get the category and set the style
         category = alert.get("category", "Advisory")
 
         #set visual style
@@ -105,13 +131,11 @@ else:
         else:
             box = st.info
             icon = "ℹ️"
-        alert_pref = alert.get("prefecture", "Unknown")
-        if selected_prefecture != "All Prefectures" and alert_pref != selected_prefecture:
-            continue
+        # alert_pref = alert.get("prefecture", "Unknown")
+        # if selected_prefecture != "All Prefectures" and alert_pref != selected_prefecture:
+        #     continue
         
-        title_en = alert.get("translated_title_en") or alert.get("title") or "Untitled"
-        title_zh = alert.get("translated_title_zh") or alert.get("title") or "Untitled"
-        display_title = title_en if language == "English" else title_zh
+        
         #display high visibility box
         box(f"{icon} **{category.upper()}**: {display_title} ")
         updated_jst = _parse_to_jst(str(alert.get("updated") or ""))
@@ -135,12 +159,17 @@ else:
                 st.write(alert.get("translated_summary_en") or alert.get("summary") or "")
                 st.markdown("### Emergency Actions")
                 action_text = alert.get("emergency_actions_en") or "Stay alert for further updates."
+                if isinstance(action_text, list):
+                    action_text = " | ".join(action_text)  
                 st.warning(action_text)
             else:
+                #chinese block
                 st.markdown("### Summary")
                 st.write(alert.get("translated_summary_zh") or alert.get("summary") or "")
                 st.markdown("### 紧急避难行动")
                 action_text = alert.get("emergency_actions_zh") or "请保持警惕，等待进一步更新。"
+                if isinstance(action_text, list):
+                    action_text = " | ".join(action_text)
                 st.warning(action_text)
         
 

@@ -10,6 +10,8 @@ class Alert(BaseModel):
     updated: str
     hash: Optional[str] = None  #stage 2
     ipfs_cid: Optional[str] = None #stage 2
+    prefecture: Optional[str] = None  # extracted/filled by AI or heuristics
+    category: Optional[str] = None  # Critical|Warning|Advisory
 
 class TranslatedAlert(Alert):
     """Alert with translations and trust scoring"""
@@ -17,12 +19,10 @@ class TranslatedAlert(Alert):
     translated_summary_en: Optional[str] = None
     translated_title_zh: Optional[str] = None
     translated_summary_zh: Optional[str] = None
-    emergency_actions_en: Optional[str] = "Stay alert for further updates."
-    emergency_actions_zh: Optional[str] = "请保持警惕，等待进一步更新。"
+    emergency_actions_en: Optional[str] = None
+    emergency_actions_zh: Optional[str] = None
     trust_score: Optional[float] = None  # 0-10 score for Stage 3
-    prefecture: Optional[str] = None  # e.g. "Tokyo"
-    category: Optional[str] = None  # e.g. "Warning", "Advis
-    ipfs_cid: Optional[str] = None
+    # prefecture/category/hash/ipfs_cid inherited from Alert
 
 class Provenance(BaseModel):
     """Track source information for traceability"""
