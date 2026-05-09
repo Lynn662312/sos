@@ -79,7 +79,7 @@ def fetch_jma_alerts() -> list[Alert]:
     return alerts
 
 
-def fetch_jma_alerts_verified(limit: int = 3) -> list[TranslatedAlert]:
+def fetch_jma_alerts_verified(limit: int = 2) -> list[TranslatedAlert]:
     """
     Full pipeline: hash -> translate -> IPFS -> Solana provenance.
     Kept for manual testing; API should prefer Filter-First translation to save quota.

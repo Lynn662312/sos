@@ -38,7 +38,7 @@ def upload_to_ipfs(data: Mapping[str, Any]) -> str:
             PINATA_PIN_JSON_URL,
             headers=headers,
             json={"pinataContent": dict(data)},
-            timeout=30,
+            timeout=60,
         )
     except requests.RequestException as e:
         raise RuntimeError(f"Pinata request failed: {e}") from e

@@ -61,7 +61,7 @@ with st.sidebar:
             "Fukuoka", "Saga", "Nagasaki", "Kumamoto", "Oita", "Miyazaki", "Kagoshima",
             "Okinawa"
         ],
-        index=1
+        index=13
     )
     st.info("Note: Manual selection for now. Future versions may auto-detect location or allow saving preferences.")
     st.divider()
@@ -208,7 +208,7 @@ else:
                             resp = requests.post(
                                 f"http://localhost:8000/api/generate-audio/{alert.get('id')}",
                                 json={"text": tts_text, "language": lang_code},
-                                timeout=30,
+                                timeout=60,
                             )
                             if resp.status_code == 200:
                                 audio_key = f"audio_{alert.get('id')}_{lang_code}"
