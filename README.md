@@ -59,7 +59,7 @@ audio = client.text_to_speech.convert(
 )
 return b"".join(audio)
 ```
-    - Note: This specific voice was selected for its high clarity and authoritative tone, ensuring it remains intelligible even in noisy, high-stress disaster environments.
+ - Note: This specific voice was selected for its high clarity and authoritative tone, ensuring it remains intelligible even in noisy, high-stress disaster environments.
 5. Raw MP3 bytes are returned and played instantly in the Streamlit audio player.
 
 ### Why ElevenLabs matters
@@ -107,7 +107,7 @@ sos_project/
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/Lynn662312/sos
+git clone https://github.com/Lynn662312/sos.git
 cd sos
 python -m venv venv
 venv\Scripts\activate   # Windows
@@ -174,8 +174,9 @@ To ensure the source of safety is tamper-proof, alert hashes and IPFS CIDs are r
 
 ## 🎬 Demo
 
-- **Demo video**: (https://youtu.be/TjSqSvkygRo)
-- **Demo link**: 
+- **Demo video**: https://youtu.be/TjSqSvkygRo
+- **Live demo link**: https://svowjzx4bu4wibaqowyhfa.streamlit.app/
+  - Note: Live link serves as a UI/UX preview. For full functionality (JMA Scraper + Voice), please refer to the Demo Video or follow the local setup instructions in the GitHub README.
 
 **Demo Mode**
 Click "**🚀 Trigger Demo Mode**" in the sidebar to load a mock Critical earthquake alert for Tokyo — no real disaster needed to see the full UI and audio experience.
