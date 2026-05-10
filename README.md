@@ -99,7 +99,7 @@ sos_project/
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/sos-source-of-safety.git
+git clone https://github.com/Lynn662312/sos.git
 cd sos-source-of-safety
 python -m venv venv
 venv\Scripts\activate   # Windows
@@ -127,7 +127,6 @@ SOLANA_PRIVATE_KEY=your_base58_private_key
 ```
 
 - `ELEVENLABS_API_KEY` is required for voice generation.
-- `SOLANA_RPC_URL` and `SOLANA_PRIVATE_KEY` are optional for the Solana bonus.
 
 ### 3. Start the backend
 
@@ -165,7 +164,5 @@ This project is well suited for the **ElevenLabs** track because it combines:
 - voice-first disaster accessibility
 - AI translation + trust scoring
 - official alert provenance
-
-It also supports a **Solana bonus** path for on-chain provenance, but the core submission is already strong without it.
 
 ---
