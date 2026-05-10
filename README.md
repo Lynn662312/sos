@@ -6,9 +6,11 @@ Real-time translation · AI trust scoring · Voice instructions · Blockchain pr
 
 ## 🌏 The Problem
 
-When a foreigner travels to a country whose language they don't speak and whose local systems they don't know, a natural disaster becomes doubly dangerous. During earthquakes, floods, or severe weather, reliable information is hard to find fast — and when chaos spreads, so does misinformation. Fake alerts circulate while official warnings go unread, putting lives at risk.
+When a foreigner travels to a country whose language they don't speak and whose local systems they don't know, a natural disaster becomes doubly dangerous. During earthquakes, floods, or severe weather, reliable information is hard to find fast — and when chaos spreads, so does misinformation. Fake alerts circulate while official warnings go unread, putting lives at risk. This is especially dangerous for young travellers (under 21) and solo female travellers who may have fewer local support networks.
 
-Japan is a clear example: the country publishes official disaster alerts from the Japan Meteorological Agency (JMA) in Japanese only. S.O.S intercepts those official alerts the moment they are published, filters them by prefecture, translates them into English and Simplified Chinese, scores their credibility with AI, and reads them aloud — so anyone can understand and act fast.
+Japan is a clear example: the country communicates primarily in Japanese, creating a significant language barrier for foreign visitors and residents during emergencies. Official disaster alerts from the Japan Meteorological Agency (JMA) are published in Japanese only.
+
+**S.O.S** intercepts those official alerts the moment they are published, filters them by prefecture, translates them into English and Simplified Chinese, scores their credibility with AI, and reads them aloud — so anyone can understand and act fast.
 
 ## ✨ Key Features
 
@@ -23,8 +25,8 @@ Japan is a clear example: the country publishes official disaster alerts from th
 - **IPFS Provenance**
   - Alerts are SHA-256 hashed and pinned to IPFS via Pinata for tamper-proof traceability.
 - **Solana Devnet Proof**
-  - Optional lightweight Solana devnet memo for on-chain recording of alert hash + IPFS CID.
-- **Tokyo-first Filter**
+  - Alert hash + IPFS CID recorded on Solana devnet as a lightweight on-chain memo
+- **Prefecture Filter**
   - Prefecture selection with Tokyo as the default.
 - **Demo Mode**
   - One-click mock Critical alert for testing and presentation.
@@ -62,8 +64,14 @@ return b"".join(audio)
 
 ### Why ElevenLabs matters
 
-In a disaster, reading is slower than listening. A foreigner who can't read Japanese or English well can still follow spoken instructions in their preferred language. ElevenLabs’ multilingual model supports both English and Simplified Chinese in one flow.
+In a disaster, information is a survival tool. S.O.S uses the ElevenLabs Multilingual v2 model because text alone is insufficient during a crisis for three critical reasons:
 
+1. **Speed & Accessibility**: Reading requires focus that a person in a state of panic often lacks. Spoken instructions in a native language are processed faster and are accessible to those who may be visually impaired or unfamiliar with specific scripts.  
+
+2. **Crowd Leadership & Calm**: In a crowded environment—like a train station or a tourist landmark—one person playing a clear, authoritative audio alert can inform an entire group of people at once. This collective listening helps synchronize the crowd’s movement, reducing the risk of stampedes and helping people stay calm under pressure.
+
+3. **Hands-Free Safety**: During an evacuation, users need their hands to carry belongings, hold children, or navigate obstacles. Audio allows them to receive life-saving instructions without being tethered to a screen.
+   
 ## 🛠️ Tech Stack
 
 | Layer | Technology |
@@ -99,8 +107,8 @@ sos_project/
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/Lynn662312/sos.git
-cd sos-source-of-safety
+git clone https://github.com/Lynn662312/sos
+cd sos
 python -m venv venv
 venv\Scripts\activate   # Windows
 pip install -r requirements.txt
@@ -148,21 +156,39 @@ Then visit `http://localhost:8501`.
 2. S.O.S scraper fetches the feed
 3. SHA-256 hash is generated and pinned to IPFS
 4. Gemini translates to English + Chinese and scores credibility
-5. Gemini extracts category and prefecture
+5. Gemini extracts category (Critical/Warning/Advisory) and prefecture
 6. FastAPI serves translated alerts
-7. Streamlit displays color-coded alerts
+7. Streamlit displays color-coded alerts (🔴 red / 🟡 yellow / 🔵 blue)
 8. User clicks `Generate Voice`
 9. ElevenLabs reads the alert aloud in the selected language
 
 ## ⛓️ Solana Devnet
 
-Alert hashes and IPFS CIDs are prepared for optional Solana devnet memo proof. This is a lightweight provenance add-on to strengthen traceability.
+Alert content hashes and IPFS CIDs are recorded on Solana devnet as memo transactions for lightweight on-chain provenance.
+
+Devnet deployment address: 3rHmdxNzDtZwiLXEGu1EADTbp4q5ykjN7v57D9snDRcedKZTsDwpUtftYhwXTCrM5kQZoPAqxDPdjf8bFAW5nznc
+
+## 🎬 Demo
+
+- **Demo video**: [ADD VIDEO LINK]
+
+**Demo Mode**
+Click "**🚀 Trigger Demo Mode**" in the sidebar to load a mock Critical earthquake alert for Tokyo — no real disaster needed to see the full UI and audio experience.
+
+## 🔮 Future Features
+
+- Evacuation shelter locator integrated with Japan's official shelter database
+- Embassy contacts by nationality for repatriation assistance
+- Relief supplies distribution points map
+- GPS-based auto prefecture detection
+- Push notifications for Critical alerts
+- Support for more languages (Korean, Vietnamese, Tagalog)
+- Community reports: allow locals to submit ground-level updates, with IPFS content addressing to trace origin and combat misinformation
+- Web3 identity verification for community contributors to ensure accountability
 
 ## ✅ Hackathon fit
 
-This project is well suited for the **ElevenLabs** track because it combines:
-- voice-first disaster accessibility
-- AI translation + trust scoring
-- official alert provenance
+This project is submitted for the **ElevenLabs — Best ElevenLabs Integration** track.
+It uses ElevenLabs Generate Speech to deliver life-critical disaster instructions in natural voice across multiple languages. The integration is core to the product — not decorative — because in a real emergency, voice is faster and more accessible than text for people unfamiliar with the local language.
 
 ---
