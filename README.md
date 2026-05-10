@@ -59,7 +59,7 @@ audio = client.text_to_speech.convert(
 )
 return b"".join(audio)
 ```
-
+    - Note: This specific voice was selected for its high clarity and authoritative tone, ensuring it remains intelligible even in noisy, high-stress disaster environments.
 5. Raw MP3 bytes are returned and played instantly in the Streamlit audio player.
 
 ### Why ElevenLabs matters
@@ -164,13 +164,18 @@ Then visit `http://localhost:8501`.
 
 ## ⛓️ Solana Devnet
 
-Alert content hashes and IPFS CIDs are recorded on Solana devnet as memo transactions for lightweight on-chain provenance.
+To ensure the source of safety is tamper-proof, alert hashes and IPFS CIDs are recorded on the Solana devnet.
 
-Devnet deployment address: 3rHmdxNzDtZwiLXEGu1EADTbp4q5ykjN7v57D9snDRcedKZTsDwpUtftYhwXTCrM5kQZoPAqxDPdjf8bFAW5nznc
+- On-Chain Evidence: Every verified alert creates a lightweight memo transaction.
+
+- Transaction Signature: 3rHmdxNzDtZwiLXEGu1EADTbp4q5ykjN7v57D9snDRcedKZTsDwpUtftYhwXTCrM5kQZoPAqxDPdjf8bFAW5nznc
+
+- Verification: You can verify this transaction on the Solana Explorer (Devnet) : https://explorer.solana.com/?cluster=devnet.
 
 ## 🎬 Demo
 
-- **Demo video**: [ADD VIDEO LINK]
+- **Demo video**: (https://youtu.be/TjSqSvkygRo)
+- **Demo link**: 
 
 **Demo Mode**
 Click "**🚀 Trigger Demo Mode**" in the sidebar to load a mock Critical earthquake alert for Tokyo — no real disaster needed to see the full UI and audio experience.
