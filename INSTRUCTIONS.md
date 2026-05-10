@@ -60,14 +60,14 @@ sos_project/
 - [done] **Color-Coding**: Display alerts as red/ yellow/ blue boxes based on category.
 - [done] **Audio UI**: Add "Play Audio" button for alert title, summary, and emergency action instructions.
 - [done] **Frontend**: Show audio player or download link for generated speech.
-- [ ] **README**: Document ElevenLabs integration path, the Tokyo-first focus, and which TTS method is used.
+- [done] **README**: Document ElevenLabs integration path, the Tokyo-first focus, and which TTS method is used.
 - [done] **Demo**: Add a test mode or sample Tokyo alert so you can show the Critical red box and audio instructions.
 - **This completes the ElevenLabs track requirement.**
 
 ### Stage 4B: Solana Bonus (OPTIONAL - if time allows) [1-2 hours]
 - [] **Solana Memo**: Use `@solana/web3.js` via simple Python wrapper or direct devnet transaction.
-- [maybe] **Minimal approach**: Store alert hash + IPFS CID in a Solana devnet memo transaction (not a full program).
-- [ ] **Track reference**: Add devnet transaction signature to README for provenance.
+- [done] **Minimal approach**: Store alert hash + IPFS CID in a Solana devnet memo transaction (not a full program).
+- [done] **Track reference**: Add devnet transaction signature to README for provenance.
 [done] **Solana Stamper**:
 - Ensure your utils/solana.py is recording the hash + CID on the devnet.
 - Display the Solana Transaction Link in the "Proof" section of the UI.
