@@ -1,20 +1,20 @@
-﻿# --- Core Framework ---
-fastapi
-uvicorn
-python-dotenv
+# --- Core Framework ---
+fastapi==0.136.1
+uvicorn==0.46.0
+python-dotenv==1.2.2
 
 # --- Data & Web3 ---
-feedparser
-requests
-base58        # Required for Solana key handling
-solana        # Solana RPC client
-solders       # High-performance Solana Python bindings
+feedparser==6.0.12
+requests==2.33.1
+base58==2.1.1        # Required for Solana key handling
+solana==0.36.11       # Solana RPC client
+solders==0.27.1       # High-performance Solana Python bindings
 
 # --- AI & Models ---
-google-genai
-pydantic
-pydantic-settings
+google-genai==2.0.0
+pydantic==2.13.4
+pydantic-settings==2.14.1
 
 # --- Frontend ---
-streamlit
-elevenlabs    # For Stage 4 Voice integration
+streamlit==1.57.0
+elevenlabs==2.46.0    # For Stage 4 Voice integration
