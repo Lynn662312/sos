@@ -81,9 +81,6 @@ def translate_alert_data(alert: Alert) -> TranslatedAlert:
     api_key = os.getenv("GEMINI_API_KEY")
     model = os.getenv("GEMINI_MODEL")
 
-    if not api_key:
-        raise RuntimeError("Missing GEMINI_API_KEY in environment/.env")
-
     # The Prompt remains the same (it's the most important part!)
     
     prompt = f"""
@@ -130,6 +127,9 @@ Output MUST be strict JSON ONLY (no markdown, no backticks, no extra keys):
     """.strip()
 
     try:
+        if not api_key:
+            raise RuntimeError("Missing GEMINI_API_KEY in environment/.env")
+
         # 1. Initialize the NEW Client
         client = genai.Client(api_key=api_key)
 
