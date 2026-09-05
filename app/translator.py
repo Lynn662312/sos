@@ -165,9 +165,9 @@ Output MUST be strict JSON ONLY (no markdown, no backticks, no extra keys):
             translated_summary_en=payload.get("translated_summary_en"),
             translated_title_zh=payload.get("translated_title_zh"),
             translated_summary_zh=payload.get("translated_summary_zh"),
-            emergency_actions_en=" | ".join(payload.get("emergency_actions_en")
+            emergency_actions_en=" | ".join(_safe_str_list(payload.get("emergency_actions_en"))
             or ["Stay alert for further updates."]),
-            emergency_actions_zh=" | ".join(payload.get("emergency_actions_zh")
+            emergency_actions_zh=" | ".join(_safe_str_list(payload.get("emergency_actions_zh"))
             or ["请保持警惕，等待进一步更新。"]),
             prefecture=payload.get("prefecture"),
             category=payload.get("category"),

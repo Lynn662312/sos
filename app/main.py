@@ -55,7 +55,7 @@ def get_alerts(prefecture: str = "Tokyo"):
         "Mie": "三重", "Shiga": "滋賀", "Kyoto": "京都", "Osaka": "大阪",
         "Hyogo": "兵庫", "Nara": "奈良", "Wakayama": "和歌山",
         "Tottori": "鳥取", "Shimane": "島根", "Kumamoto": "熊本", 
-        "Oita": "大分", "Miyazaki": "宮崎", "Kagoshima": "鹿児島", "Okinawa": "沖縄    "
+        "Oita": "大分", "Miyazaki": "宮崎", "Kagoshima": "鹿児島", "Okinawa": "沖縄"
     }
     search_keyword = pref_map.get(prefecture, prefecture)
     # search_keyword_l = search_keyword.lower()
