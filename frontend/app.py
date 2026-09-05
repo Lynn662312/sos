@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
@@ -7,7 +8,17 @@ import requests
 import streamlit as st
 
 
-API_URL = "http://localhost:8000/api/alerts"
+def _get_api_base_url() -> str:
+    """Resolve the backend base URL: Streamlit secrets > env var > localhost fallback."""
+    try:
+        return st.secrets["API_BASE_URL"]
+    except Exception:
+        pass
+    return os.environ.get("API_BASE_URL", "http://localhost:8000")
+
+
+API_BASE_URL = _get_api_base_url().rstrip("/")
+API_URL = f"{API_BASE_URL}/api/alerts"
 JST = timezone(timedelta(hours=9), name="JST")
 
 def _parse_to_jst(updated: str) -> str:
@@ -107,7 +118,6 @@ if st.sidebar.button("🚀 Trigger Demo Mode"):
 # --------------------------
 
 alerts = st.session_state.alerts or []
-alerts = st.session_state.alerts or []
 
 if not alerts:
     st.info("No alerts to display yet. Click Refresh Alerts.")
@@ -206,7 +216,7 @@ else:
 
                         try:
                             resp = requests.post(
-                                f"http://localhost:8000/api/generate-audio/{alert.get('id')}",
+                                f"{API_BASE_URL}/api/generate-audio/{alert.get('id')}",
                                 json={"text": tts_text, "language": lang_code},
                                 timeout=60,
                             )

@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: sos-backend
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.9
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        sync: false
+      - key: ELEVENLABS_API_KEY
+        sync: false
+      - key: PINATA_API_KEY
+        sync: false
+      - key: PINATA_SECRET_KEY
+        sync: false
+      - key: SOLANA_RPC_URL
+        sync: false
+      - key: SOLANA_PRIVATE_KEY
+        sync: false
