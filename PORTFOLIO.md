@@ -5,7 +5,7 @@
 **Status:** Prototype
 **Categories:** AI · Backend · Web · Web3 · Voice
 **Repo:** [Lynn662312/sos](https://github.com/Lynn662312/sos)
-**Live demo:** https://svowjzx4bu4wibaqowyhfa.streamlit.app/
+**Live demo:** https://sos-0aae.onrender.com
 **Hackathon:** Dev3 Hackathon
 
 ## Tagline
@@ -41,5 +41,6 @@ Python · FastAPI · Streamlit · Pydantic · Gemini · ElevenLabs · IPFS · Pi
 
 ## Notes for the record
 
-- The live Streamlit deployment is a UI/UX preview only — the JMA scraper and ElevenLabs voice generation require the FastAPI backend running locally (API keys + `uvicorn app.main:app`), documented in the repo README.
+- Deployed as two Render services: `sos-backend` (FastAPI) and `sos` (Streamlit), auto-deploying from `main`. The live demo is fully functional end-to-end — JMA scraping, Gemini translation/scoring, IPFS pinning, and ElevenLabs voice all run against the deployed backend, not a static preview. See the README's Deployment section for the setup.
+- Free-tier hosting means the services spin down after 15 minutes idle; the first request after inactivity takes 30-50s to wake up.
 - Solana provenance is implemented (`app/utils/solana.py`) and exercised via the manual `fetch_jma_alerts_verified()` pipeline, but is not wired into the live `/api/alerts` endpoint used by the deployed demo (kept off the hot path to conserve API quota).

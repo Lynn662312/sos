@@ -6,7 +6,8 @@
     "codespaces": {
       "openFiles": [
         "README.md",
-        "app/main.py"
+        "app/main.py",
+        "frontend/app.py"
       ]
     },
     "vscode": {
@@ -19,15 +20,20 @@
   },
   "updateContentCommand": "[ -f packages.txt ] && sudo apt update && sudo apt upgrade -y && sudo xargs apt install -y <packages.txt; [ -f requirements.txt ] && pip3 install --user -r requirements.txt; pip3 install --user streamlit; echo '✅ Packages installed and Requirements met'",
   "postAttachCommand": {
-    "server": "streamlit run app/main.py --server.enableCORS false --server.enableXsrfProtection false"
+    "backend": "uvicorn app.main:app --host 0.0.0.0 --port 8000",
+    "frontend": "streamlit run frontend/app.py --server.enableCORS false --server.enableXsrfProtection false"
   },
   "portsAttributes": {
+    "8000": {
+      "label": "API"
+    },
     "8501": {
       "label": "Application",
       "onAutoForward": "openPreview"
     }
   },
   "forwardPorts": [
+    8000,
     8501
   ]
 }

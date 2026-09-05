@@ -89,6 +89,8 @@ In a disaster, information is a survival tool. S.O.S uses the ElevenLabs Multili
 ```text
 sos_project/
 ├── .env                    # API keys (not committed)
+├── .python-version         # Pins the Python runtime for local + Render
+├── render.yaml             # Render Blueprint for the FastAPI backend
 ├── app/
 │   ├── main.py             # FastAPI routes
 │   ├── models.py           # Pydantic schemas
@@ -150,6 +152,22 @@ streamlit run frontend/app.py
 
 Then visit `http://localhost:8501`.
 
+## ☁️ Deployment
+
+The app runs as two separately deployed services on [Render](https://render.com):
+
+| Service | What it runs | URL |
+|---|---|---|
+| `sos-backend` | FastAPI (`uvicorn app.main:app`), defined by `render.yaml` | https://sos-backend-nlk6.onrender.com |
+| `sos` | Streamlit frontend (`streamlit run frontend/app.py`) | https://sos-0aae.onrender.com |
+
+Both auto-deploy from the `main` branch. The backend's 7 API keys are set as environment variables directly in its Render dashboard (not committed). The frontend resolves the backend URL in this order: Streamlit secrets (`API_BASE_URL`) → `API_BASE_URL` env var → `http://localhost:8000` fallback for local dev — so the same `frontend/app.py` works unmodified in both environments.
+
+To redeploy your own copy:
+1. Fork/push this repo, then create a Render **Blueprint** from `render.yaml` (or `render services create`) for the backend, and a separate Render web service for the Streamlit frontend (build command `pip install -r requirements.txt`, start command `streamlit run frontend/app.py`).
+2. Add the 7 keys from `.env_sample` to the backend service's environment.
+3. Add `API_BASE_URL=<your backend's Render URL>` to the frontend service's environment.
+
 ## 🗺️ User Flow
 
 1. JMA publishes alert (Japanese)
@@ -175,8 +193,9 @@ To ensure the source of safety is tamper-proof, alert hashes and IPFS CIDs are r
 ## 🎬 Demo
 
 - **Demo video**: https://youtu.be/TjSqSvkygRo
-- **Live demo link**: https://svowjzx4bu4wibaqowyhfa.streamlit.app/
-  - Note: Live link serves as a UI/UX preview. For full functionality (JMA Scraper + Voice), please refer to the Demo Video or follow the local setup instructions in the GitHub README.
+- **Live demo link**: https://sos-0aae.onrender.com
+  - Fully functional: live JMA scraping, Gemini translation/scoring, IPFS pinning, and ElevenLabs voice all run against the deployed backend — not just a UI preview.
+  - Note: hosted on Render's free tier, which spins down after 15 minutes of inactivity. The first request after idle time can take 30-50s to wake up — just refresh if the first load times out.
 
 **Demo Mode**
 Click "**🚀 Trigger Demo Mode**" in the sidebar to load a mock Critical earthquake alert for Tokyo — no real disaster needed to see the full UI and audio experience.
