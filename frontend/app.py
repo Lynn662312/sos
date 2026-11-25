@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import os
+import time
 from datetime import datetime, timedelta, timezone
-from typing import Any
+from typing import Any, Callable, Optional
 
 import requests
 import streamlit as st
@@ -40,13 +41,43 @@ def _parse_to_jst(updated: str) -> str:
     return dt.astimezone(JST).strftime("%Y-%m-%d %H:%M:%S %Z")
 
 
-def _fetch_alerts(prefecture: str = "All Prefectures") -> list[dict[str, Any]]:
-    resp = requests.get(f"{API_URL}?prefecture={prefecture}", timeout=60)
-    resp.raise_for_status()
-    payload = resp.json()
-    if not isinstance(payload, list):
-        raise ValueError("API returned non-list payload")
-    return payload
+# Render's free tier spins the backend down after ~15 min idle; the first
+# request after that wakes it up but can take 20-30s, and Render's edge
+# often returns a 502/503 for requests that arrive before it's ready. Retry
+# with backoff instead of failing on the very first attempt.
+_RETRYABLE_STATUS = {502, 503, 504}
+
+
+def _fetch_alerts(
+    prefecture: str = "All Prefectures",
+    max_attempts: int = 5,
+    backoff_seconds: float = 6.0,
+    on_retry: Optional[Callable[[int, int], None]] = None,
+) -> list[dict[str, Any]]:
+    last_error: Exception = RuntimeError("no attempts made")
+    for attempt in range(1, max_attempts + 1):
+        try:
+            resp = requests.get(f"{API_URL}?prefecture={prefecture}", timeout=20)
+            if resp.status_code in _RETRYABLE_STATUS:
+                raise requests.exceptions.HTTPError(
+                    f"{resp.status_code} Server Error (backend likely still waking up)"
+                )
+            resp.raise_for_status()
+            payload = resp.json()
+            if not isinstance(payload, list):
+                raise ValueError("API returned non-list payload")
+            return payload
+        except (
+            requests.exceptions.HTTPError,
+            requests.exceptions.ConnectionError,
+            requests.exceptions.Timeout,
+        ) as e:
+            last_error = e
+            if attempt < max_attempts:
+                if on_retry:
+                    on_retry(attempt, max_attempts)
+                time.sleep(backoff_seconds)
+    raise last_error
 
 
 st.set_page_config(page_title="S.O.S (Source of Safety)", layout="wide")
@@ -90,11 +121,25 @@ if "alerts" not in st.session_state:
     st.session_state.alerts = []
 
 if refresh or not st.session_state.alerts:
+    status_placeholder = st.empty()
+
+    def _report_retry(attempt: int, max_attempts: int) -> None:
+        status_placeholder.info(
+            "⏳ Waking up the backend — free hosting sleeps after inactivity, "
+            f"this can take up to ~30s (attempt {attempt}/{max_attempts - 1})..."
+        )
+
     try:
-        st.session_state.alerts = _fetch_alerts(selected_prefecture)
+        st.session_state.alerts = _fetch_alerts(selected_prefecture, on_retry=_report_retry)
+        status_placeholder.empty()
         st.success(f"Loaded {len(st.session_state.alerts)} alerts.")
     except Exception as e:
-        st.error(f"Failed to fetch alerts from API: {e}")
+        status_placeholder.empty()
+        st.error(
+            "Couldn't reach the alerts backend after several attempts. It's most "
+            "likely still waking up from sleep on free hosting — click **Refresh "
+            f"Alerts** again in about 30 seconds.\n\nDetails: {e}"
+        )
 
 # --- ADD MOCK DEMO HERE ---
 if st.sidebar.button("🚀 Trigger Demo Mode"):
